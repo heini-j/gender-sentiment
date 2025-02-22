@@ -17,55 +17,6 @@ font_add_google("Lato", "lato")
 
 sentiment_df <- read_csv("df_combined.csv")
 
-View(sentiment_df)
-
-# Moving the code to the beginning of the dataframe
-
-sentiment_df <- sentiment_df |>
-  relocate(code)
-
-# Renaming some columns for simplicity
-
-sentiment_df <- sentiment_df |>
-  rename(
-    date = Date,
-    paper = Paper,
-    title = "Title of article"
-  )
-
-# creating round 1, round 2 and round 3 variables based on the date
-
-sentiment_df$date <- dmy(sentiment_df$date)
-
-# creating a round1 variable if the date is before 1-12-2022
-
-sentiment_df$round1 <- ifelse(sentiment_df$date < dmy("01-12-2022"), 1, 0)
-sentiment_df$round2 <- ifelse(sentiment_df$date >= dmy("01-12-2022") & sentiment_df$date < dmy("01-12-2023"), 1, 0)
-sentiment_df$round3 <- ifelse(sentiment_df$date >= dmy("01-12-2023"), 1, 0)
-
-# Creating a variable "round" that is 1, 2 or 3 based on the date
-
-sentiment_df$round <- case_when(
-  sentiment_df$date < dmy("01-12-2022") ~ 1,
-  sentiment_df$date >= dmy("01-12-2022") & sentiment_df$date < dmy("01-12-2023") ~ 2,
-  sentiment_df$date >= dmy("01-12-2023") ~ 3
-)
-
-# Creating a new column for the gender of the politician
-
-sentiment_df <- sentiment_df |>
-  mutate(
-    gender = ifelse(code %in% 
-                      c("EH", "BHK", "LM", "LS", "VA", "KKS", "EBS", "MR", "MM", "IK"), 
-                    "female", "male")
-  )
-
-# changing the type of all columns starting "sentiment_" to numeric
-
-sentiment_df <- sentiment_df |>
-  mutate(across(starts_with("sentiment_"), as.numeric))
-
-write_csv(sentiment_df, "df_combined.csv")
 
 # Plotting the sentiment scores -------------------------------------------
 
@@ -73,12 +24,12 @@ write_csv(sentiment_df, "df_combined.csv")
 # density plots -----------------------------------------------------------
 ?geom_density
 
-selected_colors <- paletteer::paletteer_d("NineteenEightyR::miami2")[c(5, 1)]
+selected_colors <- paletteer::paletteer_d("LaCroixColoR::Berry")[c(1, 4)]
 
 # paper x gender
 density_plot <- ggplot(sentiment_df, aes(x = mean_sentiment, fill = gender)) +
   facet_wrap(~ paper, scales = "free_x", ncol = 2) +
-  geom_density(alpha = 0.4, size = 0.2, bw = 0.6) +
+  geom_density(alpha = 0.4, linewidth = 0.1, bw = 0.6) +
   labs(
     title = "Mean sentiment scores for female and male politicians",
     x = "Mean sentiment score",
@@ -86,7 +37,7 @@ density_plot <- ggplot(sentiment_df, aes(x = mean_sentiment, fill = gender)) +
     fill = NULL
   ) +
   scale_fill_manual(values = selected_colors) +
-  theme_minimal(base_family = "lato", base_size = 12) +  # Use Lato font
+  theme_minimal(base_family = "lato", base_size = 12) +
   theme(
     plot.title = element_text(size = 14),
     legend.position = "top"
@@ -94,12 +45,7 @@ density_plot <- ggplot(sentiment_df, aes(x = mean_sentiment, fill = gender)) +
 
 density_plot
 
-ggsave(density_plot
-       , filename = "density_plot.png"
-       , width = 10
-       , height = 6
-       , dpi = 300
-)
+ggsave("sentiment_scores.emf", plot = density_plot, width = 8, height = 6, device = "emf")
 
 ggplot(sentiment_df, aes(x = mean_sentiment, fill = paper)) +
   facet_wrap(~ paper, scales = "free_x", ncol = 2) +  
