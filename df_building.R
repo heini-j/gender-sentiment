@@ -2,11 +2,11 @@ library(readr)
 library(tidyverse)
 
 # Read the CSV file
-df <- read_csv("JG.csv")
+df <- read_csv("GPF.csv")
 
 ?read_csv
 
-df |>
+df_wide |>
   dplyr::summarise(n = dplyr::n(), .by = c(Paper, Date, `Title of article`, variable)) |>
   dplyr::filter(n > 1L) 
 
@@ -20,7 +20,7 @@ View(df_wide)
 
 # adding the code of the person as a column to the new df
 
-df_wide$code <- "IK"
+df_wide$code <- "GPF"
 
 # recoding all NULL to NA in df_wide
 
@@ -78,10 +78,14 @@ for (file in file_list) {
 
 df_combined <- bind_rows(df_list)
 
+df_combined <- bind_rows(list(df_combined, df_wide))
+
+?bind_rows
+
 
 df_combined$mean_sentiment <- rowMeans(df_combined |> select(starts_with("sentiment_")), na.rm = TRUE)
 
-
+unique(df_combined$code)
 # saving the dataset
 
 write_csv(df_combined, "df_combined.csv")
