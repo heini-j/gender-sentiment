@@ -108,9 +108,18 @@ for (code in codes) {
 ridgeline(x = sentiment_df$mean_sentiment, y = sentiment_df$code, bw = 0.5, mode = TRUE)
 
 sentiment_df |>
-  ggplot(aes(x = mean_sentiment, y = code, fill = gender)) +
-  geom_density_ridges(scale = 1.5, ) +
-  theme_ridges()
+  ggplot(aes(x = mean_sentiment, y = code, fill = as.factor(gender))) +
+  geom_density_ridges(scale = 3, alpha = 0.5) +
+  facet_wrap(~ paper, scales = "free_x", ncol = 2) +
+  scale_fill_manual(values = selected_colors) +
+  theme_ridges() +
+  theme_minimal(base_family = "lato", base_size = 12) +
+  theme(
+    plot.title = element_text(size = 14),
+    legend.position = "top"
+   )
+
+
 
 # boxplots -----------------------------------------------------------------
 

@@ -18,7 +18,7 @@ descriptives <- descriptives |>
   mutate(across(starts_with("sentiment_"), as.numeric))
 
 descriptives |>
-  group_by(code) |>
+  group_by(paper, gender) |>
   summarise(n = n(),
             mean = mean(mean_sentiment, na.rm = TRUE),
             sd = sd(mean_sentiment, na.rm = TRUE)

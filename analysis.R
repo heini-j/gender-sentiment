@@ -1,4 +1,12 @@
 library(car)
+library(readr)
+
+sentiment_df <- read_csv("df_combined.csv")
+
+# t-test
+
+t.test(mean_sentiment ~ gender, data = sentiment_df)
+
 
 ols_model <- lm(mean_sentiment ~ gender * paper + round, data = sentiment_df)
 summary(ols_model)
@@ -11,7 +19,7 @@ TukeyHSD(anova_model)
 
 plot(anova_model)  # Residual plots
 shapiro.test(residuals(anova_model))  # Normality test
-leveneTest(anova_model) 
+leveneTest(anova_model)
 
 boxplot(residuals(anova_model))
 
