@@ -10,7 +10,11 @@ showtext_auto()
 # Add a Google Font (Lato as an example)
 font_add_google("Lato", "lato")
 
+# Reading the data -------------------------------------------
+
 descriptives <- read_csv("df_combined.csv")
+
+# Descriptive tables -------------------------------------------
 
 # making a summary table of the data, with n of each code and mean_sentiment mean and sd for each code, sorted in descending order
 
@@ -25,10 +29,11 @@ descriptives |>
   ) |>
   arrange(desc(n))
 
+# Visualising -------------------------------------------
+
 # Making a stacked bar plot showing the n for each code per paper
 
 selected_colors <- paletteer::paletteer_d("LaCroixColoR::Berry")[c(4, 6)]
-
 
  descriptives_plot <- descriptives |>
   group_by(code, paper, gender) |>
