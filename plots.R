@@ -6,6 +6,7 @@ library(ggridges)
 library(ggplot2)
 library(showtext)
 library(paletteer)
+library(forcats)
 
 # Enable showtext
 showtext_auto()
@@ -13,7 +14,7 @@ showtext_auto()
 # Add a Google Font (Lato as an example)
 font_add_google("Lato", "lato")
 
-# Reading and cleaning the data -------------------------------------------
+# Reading the data -------------------------------------------
 
 sentiment_df <- read_csv("df_combined.csv")
 
@@ -22,7 +23,7 @@ sentiment_df <- read_csv("df_combined.csv")
 
 
 # density plots -----------------------------------------------------------
-?geom_density
+
 
 selected_colors <- paletteer::paletteer_d("LaCroixColoR::Berry")[c(1, 4)]
 
@@ -45,101 +46,59 @@ density_plot <- ggplot(sentiment_df, aes(x = mean_sentiment, fill = gender)) +
 
 density_plot
 
-ggsave("sentiment_scores.emf", plot = density_plot, width = 8, height = 6, device = "emf")
+ggsave("sentiment_scores.png", plot = density_plot, width = 8, height = 5, dpi = 300, 
+       scale = 1.5) 
 
-ggplot(sentiment_df, aes(x = mean_sentiment, fill = paper)) +
-  facet_wrap(~ paper, scales = "free_x", ncol = 2) +  
-  geom_density(alpha = 0.3) +
-  theme_minimal()
-
-
-# making a function to create the histogram for each code
-
-sentiment_df |>
-  filter(gender == "female") |>
-  ggplot(aes(mean_sentiment)) +
-  geom_histogram(binwidth = 0.5) +
-  facet_wrap(paper~code, scales = "free_y") +
-  labs(
-    title = "Distribution of mean sentiment scores per female politician",
-    x = "Mean sentiment score",
-    y = "Frequency"
-  ) +
-  theme_minimal()
-
-sentiment_df |>
-  filter(gender == "male") |>
-  ggplot(aes(mean_sentiment)) +
-  geom_histogram(binwidth = 0.5) +
-  facet_grid(code ~ paper, scales = "free_y") +
-  labs(
-    title = "Distribution of mean sentiment scores per female politician",
-    x = "Mean sentiment score",
-    y = "Frequency"
-  ) +
-  theme_minimal()
-
-  
-
-create_histogram <- function(code) {
-    sentiment_df |>
-    filter(code == code) |>
-    ggplot(aes(mean_sentiment)) +
-    geom_histogram(binwidth = 0.5) +
-    facet_wrap(~paper) +
-    labs(
-      title = paste("Distribution of mean sentiment scores for", code),
-      x = "Mean sentiment score",
-      y = "Frequency"
-    )
-}
-
-codes <- c("EH", "BHK", "LM", "LS", "VA", "KKS", "EBS", "MR", "MM", "IK",
-           "AC", "TB", "GP", "IC", "AR", "EN", "TA", "GPF", "MC", "JG")
-
-for (code in codes) {
-  create_histogram(code)
-  print(paste("Histogram for code", code, "created"))
-  
-}
 
 # ridgeline plots -----------------------------------------------------------
 
 ridgeline(x = sentiment_df$mean_sentiment, y = sentiment_df$code, bw = 0.5, mode = TRUE)
 
-sentiment_df |>
-  ggplot(aes(x = mean_sentiment, y = code, fill = as.factor(gender))) +
-  geom_density_ridges(scale = 3, alpha = 0.5) +
+sentiment_df <- sentiment_df |> 
+  mutate(code = factor(code, levels = sort(unique(code))))
+
+sentiment_ridges <- sentiment_df |>
+  ggplot(aes(x = mean_sentiment, y = code, fill = gender)) +
+  geom_density_ridges(scale = 3, alpha = 0.5, linewidth = 0.1) +
   facet_wrap(~ paper, scales = "free_x", ncol = 2) +
   scale_fill_manual(values = selected_colors) +
+  scale_x_continuous(limits = c(0, 10)) + 
   theme_ridges() +
-  theme_minimal(base_family = "lato", base_size = 12) +
+  labs(
+    title = "Sentiment score distribution for each politician",
+    x = "Mean sentiment score",
+    y = NULL,
+    fill = NULL
+  ) +
+  theme_minimal(base_family = "lato", base_size = 16) +
   theme(
-    plot.title = element_text(size = 14),
+    plot.title = element_text(size = 18),
     legend.position = "top"
    )
 
+ggsave("sentiment_ridges.png", plot = sentiment_ridges, units = "in", width = 5, height = 8, dpi = 300, 
+       scale = 1.5)
 
 
-# boxplots -----------------------------------------------------------------
 
-# making a stacked bar plot to show how many observations there are of each code in the dataframe
+# boxplot, paper x round  -----------------------------------------------------------------
+
+# sentiment scores per gender and round
+
 
 sentiment_df |>
-  ggplot(aes(x = fct_infreq(code), fill = paper)) +
-  geom_bar(position = "stack") +
+  filter(!is.na(round)) |># Pipe the data into ggplot()
+  ggplot(aes(x = mean_sentiment, y = factor(round), fill = gender)) +
+  geom_boxplot(na.rm = TRUE) +
   labs(
-    title = "Number of observations per code",
-    x = "Code",
-    y = "Count"
+    title = "Sentiment scores",
+    x = "Mean sentiment score",
+    y = "Round"
   ) +
-  geom_text( 
-    size = 3, position = position_stack(vjust = 0.5)) + 
   theme_minimal()
 
 
-sentiment_df |>
-  group_by(code) |>
-  summarise(n = n(), mean = mean(mean_sentiment), sd = sd(mean_sentiment))
 
-unique(sentiment_df$code)
+
+
+
