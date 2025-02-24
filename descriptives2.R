@@ -21,13 +21,15 @@ descriptives <- read_csv("df_combined.csv")
 descriptives <- descriptives |>
   mutate(across(starts_with("sentiment_"), as.numeric))
 
-descriptives |>
+descriptives_table <- descriptives |>
   group_by(paper, gender) |>
   summarise(n = n(),
             mean = mean(mean_sentiment, na.rm = TRUE),
             sd = sd(mean_sentiment, na.rm = TRUE)
   ) |>
-  arrange(desc(n))
+  arrange(desc(gender))
+
+write_excel_csv2(descriptives_table, "descriptives_table.csv")
 
 # Visualising -------------------------------------------
 
@@ -44,22 +46,19 @@ selected_colors <- paletteer::paletteer_d("LaCroixColoR::Berry")[c(4, 6)]
   facet_wrap(~ gender, scales = "free_x", ncol = 2) +
   geom_text(aes(label = n), 
             position = position_stack(vjust = 0.5),  # Center inside the bars
-            size = 3, color = "white") +  # Adjust text size & color
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(title = "Number of articles on each politician by source",
+            size = 10, color = "white") +  # Adjust text size & color
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 30),
+              axis.text.y = element_text(size = 30),
+              plot.title = element_text(size = 30),
+              legend.text = element_text(size = 30),
+              strip.text = element_text(size = 30))+
+  labs(title = NULL,
        x = NULL,
        y = NULL,
        fill = NULL) +
   scale_fill_manual(values = selected_colors) +
-  theme_minimal(base_family = "lato", base_size = 12) +  
-  theme(
-    plot.title = element_text(size = 14),
-    legend.position = "top",
-    axis.text.y = element_blank(),  # Remove y-axis text
-    axis.ticks.y = element_blank(), # Remove y-axis ticks
-    panel.grid.major.y = element_blank(),  # Remove horizontal grid lines
-    panel.grid.minor.y = element_blank())
+  theme_minimal(base_family = "lato", base_size = 28)
  
- ggsave("articles.emf", plot = descriptives_plot, width = 8, height = 6, device = "emf")
+ ggsave("articles.png", plot = descriptives_plot, width = 8, height = 6, dpi = 300)
   
 
