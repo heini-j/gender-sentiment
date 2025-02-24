@@ -29,7 +29,22 @@ descriptives_table <- descriptives |>
   ) |>
   arrange(desc(gender))
 
-write_excel_csv2(descriptives_table, "descriptives_table.csv")
+write_excel_csv(descriptives_table, "descriptives_table.csv")
+
+# only number of articles
+
+descriptives_table2 <- descriptives |>
+  group_by(paper, gender, round) |>
+  summarise(n = n()
+  ) |>
+  arrange(desc(gender))
+
+write_excel_csv(descriptives_table2, "descriptives_table2.csv")
+
+# Finding what the NA rows for date are
+
+descriptives |>
+  filter(is.na(date))
 
 # Visualising -------------------------------------------
 
