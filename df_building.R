@@ -112,6 +112,45 @@ df_combined <- df_combined |>
 df_combined <- df_combined |>
   mutate(across(starts_with("sentiment_"), as.numeric))
 
+# Control variables -----------------------------------------------------------
+
+df_combined <- read_csv("df_combined.csv")
+
+# seniority in years
+
+df_combined$seniority <- case_when(
+  df_combined$code %in% c("LM", "LS") ~ 4,
+  df_combined$code %in% c("MR", "EBS", "EH", "TB") ~ 5,
+  df_combined$code %in% c("IK") ~ 7,
+  df_combined$code %in% c("MM", "AC") ~ 9,
+  df_combined$code %in% c("BHK", "KKS", "AR", "JG", "MC", "TA") ~ 13,
+  df_combined$code %in% c("IC", "EN") ~ 17,
+  df_combined$code %in% c("VA") ~ 19,
+  df_combined$code %in% c("GP", "GPF") ~ 21)
+
+# party's placement on the left_right on 1-3 scale with labels
+
+df_combined$left_right <- case_when(
+  df_combined$code %in% c("EH", "LM", "EBS", "MM", "IK", "EN") ~ 1,
+  df_combined$code %in% c("BHK", "VA", "LS", "GPF", "MC", "JG") ~ 2,
+  df_combined$code %in% c("KKS", "MR", "GP", "AR", "IC", "AC", "TB", "TA") ~ 3
+)
+
+df_combined |>
+  mutate(left_right = factor(left_right, levels = 1:3, labels = c("left", "center", "right")))
+
+# placement in 2024
+
+df_combined$placement_2024 <- case_when(
+  df_combined$code %in% c("EBS", "KKS", "VA", "AR", "GP", "IC") ~ 1,
+  df_combined$code %in% c("BHK", "EH", "AC", "TB") ~ 2,
+  df_combined$code %in% c("IK", "MM", "MR", "EN", "GPF", "JG", "MC", "TA") ~ 3,
+  df_combined$code %in% c("LS", "LM") ~ 4
+)
+
+df_combined |>
+  mutate(placement_2024 = factor(placement_2024, levels = 1:4, labels = c("federal council", "council of states", "national council", "party president")))
+
 
 # saving the dataset ----------------------------------------------------------
 
