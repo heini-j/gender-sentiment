@@ -16,38 +16,23 @@ font_add_google("Lato", "lato")
 
 sentiment_df <- read_csv("df_combined.csv")
 
-
-# t-test -----------------------------------------------------------
-
-t.test(mean_sentiment ~ gender, data = sentiment_df)
-
 # OLS regression -----------------------------------------------------------
 
-ols_model <- lm(mean_sentiment ~ gender * paper, data = sentiment_df)
-summary(ols_model)
-
-model_summary <- tidy(ols_model, conf.int = TRUE, conf.level = 0.95)
-
-?tidy
-
-stargazer(ols_model, type = "html", out = "regression_results.doc")
-
-write_excel_csv(ols_model, "OLS_summary.csv")
-
-# Plotting the interaction effect ----------------------------------------
-
-effect_plot <- allEffects(ols_model)
-ggplot(effect_plot) +
-  geom_line() 
-
-# Changing gender and paper to factors -----------------------------------
+# base model
 
 sentiment_df$gender <- as.factor(sentiment_df$gender)
 sentiment_df$paper <- as.factor(sentiment_df$paper)
 
-interaction_results <- ggpredict(ols_model, terms = c("gender", "paper"), ci_level = 0.95)
+ols_model <- lm(mean_sentiment ~ gender * paper, data = sentiment_df)
+summary(ols_model)
 
-?ggpredict
+# printing the results in a table to a doc file
+
+stargazer(ols_model, type = "html", out = "ols_model.doc")
+
+# Plotting the interaction effect 
+
+interaction_results <- ggpredict(ols_model, terms = c("gender", "paper"), ci_level = 0.95)
 
 print(interaction_results)
 
@@ -70,12 +55,70 @@ interaction <- ggplot(interaction_results, aes(x = x, y = predicted, group = gro
 ggsave("interaction_plot.png", interaction, width = 6, height = 3, dpi = 300)
   
 
-# plotting the OLS results -----------  ------------------------------
+# Adding the control variables  ----------------------------------------
 
-ggplot(model_summary, aes(x = term, y = estimate, ymin = conf.low, ymax = conf.high)) +
-  geom_point() +
-  geom_errorbar(width = 0.2) +
-  coord_flip() +  # Flip the coordinates for better readability
-  labs(title = "Coefficient Plot", x = "Predictors", y = "Estimated Coefficients") +
-  theme_minimal()
+# control model 1 -------------------------------------------------------
+
+ols_model_controls1 <- lm(mean_sentiment ~ gender * paper + left_right, 
+                         data = sentiment_df)
+summary(ols_model_controls1)
+
+# printing the results in a table to a doc file
+
+stargazer(ols_model_controls1, type = "html", out = "ols_model_controls1.doc")
+
+# updated interaction plot
+
+interaction_controls <- ggpredict(ols_model_controls1, terms = c("gender", "paper"), ci_level = 0.95)
+
+print(interaction_results)
+
+selected_colors <- paletteer::paletteer_d("LaCroixColoR::Berry")[c(4, 6)]
+
+interaction_control1 <- ggplot(interaction_controls, aes(x = x, y = predicted, group = group, color = group)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_color_manual(values = selected_colors) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, linewidth = 0.5) +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = "Predicted Mean Sentiment Score",
+    color = "Source",
+    caption = "The interaction effect in shown with 95% confidence intervals."
+  ) +
+  theme_minimal(base_family = "lato", base_size = 30) 
+
+ggsave("interaction_control1.png", interaction_control1, width = 6, height = 3, dpi = 300)
+
+# control model 2 -------------------------------------------------------
+
+ols_model_controls2 <- lm(mean_sentiment ~ gender * paper + seniority + placement_2024 + left_right, 
+                        data = sentiment_df)
+summary(ols_model_controls2)
+
+# printing the results in a table to a doc file
+
+stargazer(ols_model_controls2, type = "html", out = "ols_model_controls2.doc")
+
+interaction_controls2 <- ggpredict(ols_model_controls2, terms = c("gender", "paper"), ci_level = 0.95)
+
+interaction_control2 <- ggplot(interaction_controls2, aes(x = x, y = predicted, group = group, color = group)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_color_manual(values = selected_colors) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, linewidth = 0.5) +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = "Predicted Mean Sentiment Score",
+    color = "Source",
+    caption = "The interaction effect in shown with 95% confidence intervals."
+  ) +
+  theme_minimal(base_family = "lato", base_size = 30) 
+
+ggsave("interaction_control2.png", interaction_control2, width = 6, height = 3, dpi = 300)
+
+
+
 
