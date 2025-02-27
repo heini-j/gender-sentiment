@@ -10,8 +10,26 @@ if __name__ == "__main__":
 
     # Go through all the politicians sequentially.
     politicians = {
-        # "EBS": "Elisabeth Baume-Schneider",
         "AR": "Albert Rösti",
+        "EH": "Eva Herzog",
+        "BHK": "Brigitte Häberli-Koller",
+        "LM": "Lisa Mazzone",
+        "LS": "Lilian Studer",
+        "VA": "Viola Amherd",
+        "KKS": "Karin Keller-Sutter",
+        "EBS": "Elisabeth Baume-Schneider",
+        "MR": "Maja Riniker",
+        "MM": "Mattea Meyer",
+        "IK": "Irène Kälin",
+        "AC": "Andrea Caroni",
+        "TB": "Thierry Burkart",
+        "GP": "Guy Parmelin",
+        "IC": "Ignazio Cassis",
+        "EN": "Eric Nussbaumer",
+        "TA": "Thomas Aeschi",
+        "GPF": "Gerhard Pfister",
+        "MC": "Martin Candinas",
+        "JG": "Jürg Grossen",
     }
 
     for sheet_name, politician_name in politicians.items():

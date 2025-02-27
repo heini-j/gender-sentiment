@@ -8,6 +8,7 @@ library(showtext)
 library(paletteer)
 
 
+
 # Enable showtext
 showtext_auto()
 

@@ -7,7 +7,7 @@ library(paletteer)
 # Enable showtext
 showtext_auto()
 
-# Add a Google Font (Lato as an example)
+# Add a Google Font
 font_add_google("Lato", "lato")
 
 # Reading the data -------------------------------------------
@@ -41,10 +41,6 @@ descriptives_table2 <- descriptives |>
 
 write_excel_csv(descriptives_table2, "descriptives_table2.csv")
 
-# Finding what the NA rows for date are
-
-descriptives |>
-  filter(is.na(date))
 
 # Visualising -------------------------------------------
 
