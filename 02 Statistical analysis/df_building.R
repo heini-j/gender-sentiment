@@ -55,7 +55,6 @@ for (file in file_list) {
 
 df_combined <- bind_rows(df_list)
 
-df_combined <- bind_rows(list(df_combined, df_wide))
 
 # Checking that all codes are included
 
