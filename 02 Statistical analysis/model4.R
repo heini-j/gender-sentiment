@@ -29,6 +29,8 @@ summary(ols_congruence)
 
 stargazer(ols_congruence, type = "html", out = "ols_congruence.doc")
 
+# coefficient plot
+
 coef_plot <- plot_model(ols_congruence, type = "est", show.values = TRUE, show.p = TRUE, ci.lvl = 0.95)
 
 selected_colors <- paletteer::paletteer_d("LaCroixColoR::Berry")[c(1, 5)]
