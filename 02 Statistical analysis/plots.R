@@ -11,7 +11,7 @@ library(forcats)
 # Enable showtext
 showtext_auto()
 
-# Add a Google Font (Lato as an example)
+# Add a Google Font 
 font_add_google("Lato", "lato")
 
 # Reading the data -------------------------------------------
@@ -51,8 +51,6 @@ ggsave("sentiment_scores.png", plot = density_plot, width = 6, height = 4, dpi =
 
 
 # ridgeline plots -----------------------------------------------------------
-
-ridgeline(x = sentiment_df$mean_sentiment, y = sentiment_df$code, bw = 0.5, mode = TRUE)
 
 sentiment_df <- sentiment_df |> 
   mutate(code = factor(code, levels = sort(unique(code))))
@@ -94,7 +92,7 @@ ggsave("sentiment_ridges.png", plot = sentiment_ridges, width = 5, height = 6, d
 
 
 sentiment_df |>
-  filter(!is.na(round)) |># Pipe the data into ggplot()
+  filter(!is.na(round)) |>
   ggplot(aes(x = mean_sentiment, y = factor(round), fill = gender)) +
   geom_boxplot(na.rm = TRUE) +
   labs(
