@@ -8,7 +8,6 @@ library(showtext)
 library(paletteer)
 
 
-
 # Enable showtext
 showtext_auto()
 
@@ -19,10 +18,12 @@ sentiment_df <- read_csv("df_combined.csv")
 
 # OLS regression -----------------------------------------------------------
 
-# base model
+# recoding the variables as factors
 
 sentiment_df$gender <- as.factor(sentiment_df$gender)
 sentiment_df$paper <- as.factor(sentiment_df$paper)
+
+# base model
 
 ols_model <- lm(mean_sentiment ~ gender * paper, data = sentiment_df)
 summary(ols_model)
