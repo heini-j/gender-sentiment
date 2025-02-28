@@ -1,5 +1,5 @@
-import genepool.llm as llm
-import genepool.data as data
+import sentimental.llm as llm
+import sentimental.data as data
 
 
 if __name__ == "__main__":
